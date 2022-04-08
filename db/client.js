@@ -1,10 +1,8 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
+require("dotenv").config();
 var db_;
-const uri =
-  "mongodb+srv://jemish1331:9825354998@cluster0.qstev.mongodb.net/TaskManagementDB?retryWrites=true&w=majority";
 const connectDB = async () => {
-  var uri =
-    "mongodb+srv://jemish1331:9825354998@cluster0.qstev.mongodb.net/test";
+  var uri = process.env.MONGODB_CONNECTION_STRING;
   const client = new MongoClient(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -13,11 +11,8 @@ const connectDB = async () => {
 
   await client.connect(async (err, db) => {
     try {
-      console.log(err);
       if (!err) db_ = await db?.db("TaskManagementDB");
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   });
 };
 module.exports = { connectDB: connectDB, getDB: () => db_ };
