@@ -50,4 +50,4 @@ app.post("/add-subtask", (req, res) => {
   connectDB.getDB().collection("SubTaskDB").insertMany(req.body);
   res.send("SubTask added successfully");
 });
-app.listen(3000);
+app.listen(process.env.PORT || 3000);
