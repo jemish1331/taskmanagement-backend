@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const connectDB = require("./db/client");
+const ObjectID = require("mongodb").ObjectId;
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.set("view engine", "ejs");
@@ -48,14 +49,14 @@ app.post("/create-task", (req, res) => {
   res.send("Task added successfully");
 });
 
-app.post("/add-subtask", (req, res) => {
-  connectDB.getDB().collection("SubTaskDB").insertOne(req.body);
-  connectDB
+app.post("/add-subtask", async (req, res) => {
+  await connectDB.getDB().collection("SubTaskDB").insertOne(req.body);
+  await connectDB
     .getDB()
     .collection("TaskDB")
     .updateOne(
-      { _id: req.body?.parentTaskID },
-      { $set: { status: "In Progress" } }
+      { _id: ObjectID(req.body?.parentTaskID) },
+      { $set: { status: "In Progress", dateAndTime: req.body?.dateAndTime } }
     );
   res.send("SubTask added successfully");
 });
@@ -65,8 +66,10 @@ app.post("/change-status", (req, res) => {
     .getDB()
     .collection("TaskDB")
     .updateOne(
-      { _id: req.body?.taskID },
-      { $set: { status: req?.body?.status } }
+      { _id: ObjectID(req.body?.taskID) },
+      {
+        $set: { status: req?.body?.status, dateAndTime: req.body?.dateAndTime },
+      }
     );
   res.send("Status Updated successfully");
 });
