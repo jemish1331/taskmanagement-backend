@@ -32,10 +32,6 @@ app.get("/list-task", async (req, res) => {
     return {
       ...val,
       subTask: subTask,
-      status:
-        val?.status !== "completed" && subTask?.length > 0
-          ? "In Progress"
-          : "new",
     };
   });
 
@@ -47,12 +43,20 @@ app.post("/create-task", (req, res) => {
     taskTitle: req.body.taskTitle,
     taskDescription: req.body.taskDescription,
     dateAndTime: req.body.dateAndTime,
+    status: req?.body?.status,
   });
   res.send("Task added successfully");
 });
 
 app.post("/add-subtask", (req, res) => {
-  connectDB.getDB().collection("SubTaskDB").insertMany(req.body);
+  connectDB.getDB().collection("SubTaskDB").insertOne(req.body);
+  connectDB
+    .getDB()
+    .collection("TaskDB")
+    .updateOne(
+      { _id: req.body?.parentTaskID },
+      { $set: { status: "In Progress" } }
+    );
   res.send("SubTask added successfully");
 });
 
