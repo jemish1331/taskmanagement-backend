@@ -26,11 +26,14 @@ app.get("/list-task", async (req, res) => {
     .then((res) => (subTaskResponse = res));
 
   response = response.map((val) => {
+    let subTask = subTaskResponse.filter((value) => {
+      return value.parentTaskID === val._id.toString();
+    });
     return {
       ...val,
-      subTask: subTaskResponse.filter((value) => {
-        return value.parentTaskID === val._id.toString();
-      }),
+      subTask: subTask,
+      status:
+        val?.status !== "completed" && subTask?.length > 0 && "In Progress",
     };
   });
 
